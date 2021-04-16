@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 import requests
 from django.db import models
@@ -6,9 +7,12 @@ from django.db import models
 
 # Create your models here.
 
+
 class API(models.Model):
     name = models.CharField(max_length=128, blank=True, null=True)
     url = models.CharField(max_length=128)
+    recent_failure_time = models.DateTimeField(null=True, blank=True)
+    failure_strike = models.IntegerField(default=0)
 
     def send_request(self, request, path):
         headers = {'authorization': request.META.get('HTTP_AUTHORIZATION')}
@@ -28,7 +32,16 @@ class API(models.Model):
         else:
             data = request.data
 
-        return method_map[method](url, headers=headers, data=data, timeout=.5)
+        try:
+            result = method_map[method](url, headers=headers, data=data, timeout=.5)
+            self.failure_strike = 0
+            self.save()
+            return result
+        except:
+            self.failure_strike += 1
+            self.recent_failure_time = datetime.now()
+            self.save()
+            return None
 
     def __unicode__(self):
         return self.name
