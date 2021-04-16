@@ -16,6 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from gateway.views import MainGatewayView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('*', MainGatewayView.as_view())
 ]
