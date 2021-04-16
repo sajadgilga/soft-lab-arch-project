@@ -13,5 +13,5 @@ class User(AbstractUser):
         ADMIN = 0, _('admin')
         CLIENT = 1, _('client')
 
-    phone = models.CharField(validators=phone_number_validator)
+    phone = models.CharField(validators=[phone_number_validator], max_length=11)
     role = models.IntegerField(choices=Roles.choices, default=Roles.CLIENT)
