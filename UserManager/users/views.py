@@ -39,4 +39,7 @@ class ProfileView(APIView):
         return Response(self.serialize(user))
 
     def put(self, request):
-        pass
+        serializer = self.get_serializer(instance=request.user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save(first_name=request.data.get('first_name'), last_name=request.data.get('last_name'))
+        return Response(self.serialize(user))
